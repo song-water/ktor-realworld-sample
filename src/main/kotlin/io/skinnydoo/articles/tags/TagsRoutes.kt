@@ -1,19 +1,16 @@
 package io.skinnydoo.articles.tags
 
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.locations.Location
-import io.ktor.locations.get
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.resources.*
+import io.ktor.server.application.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.skinnydoo.API_V1
 import io.skinnydoo.common.handleErrors
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
-@Location("/tags")
+@Resource("/tags")
 class TagsRoute
 
 fun Route.getTags() {

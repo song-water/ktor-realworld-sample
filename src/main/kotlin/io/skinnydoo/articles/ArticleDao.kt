@@ -17,6 +17,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 interface ArticleDao {
   suspend fun insert(article: NewArticle, authorId: UserId): Slug
@@ -145,7 +146,7 @@ class DefaultArticleDao(
     .isNotEmpty()
 
   override suspend fun delete(slug: Slug) = transactionRunner {
-    ArticleTable.deleteWhere { ArticleTable.slug eq slug.value }
+    ArticleTable.deleteWhere { ArticleTable.slug.eq(slug.value) }
   }
 
   private suspend fun toArticle(rr: ResultRow, userId: UserId?): Article {

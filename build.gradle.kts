@@ -20,55 +20,68 @@ repositories {
 }
 
 dependencies {
-  implementation(platform(Deps.Arrow.stack))
+  implementation(platform("io.arrow-kt:arrow-stack:1.2.1"))
 
-  implementation(Deps.Arrow.core)
+  implementation("io.arrow-kt:arrow-core")
 
-  implementation(Deps.coroutines)
-  implementation(Deps.coroutinesSlf4j)
+  val kotlinVersion = "1.9.21"
+  val kotlinCoroutinesVersion = "1.7.3"
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$kotlinCoroutinesVersion")
 
-  implementation(Deps.Koin.koin)
-  implementation(Deps.Koin.koinLogger)
+  val koinVersion = "3.5.3"
+  implementation("io.insert-koin:koin-ktor:$koinVersion")
+  implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
 
-  implementation(Deps.Ktor.auth)
-  implementation(Deps.Ktor.core)
-  implementation(Deps.Ktor.hostCommon)
-  implementation(Deps.Ktor.jwt)
-  implementation(Deps.Ktor.locations)
-  implementation(Deps.Ktor.netty)
-  implementation(Deps.Ktor.session)
-  implementation(Deps.Ktor.serialization)
-  implementation(Deps.serializationJson)
+  val ktorVersion = "2.3.7"
+  implementation("io.ktor:ktor-server-auth:$ktorVersion")
+  implementation("io.ktor:ktor-server-core:$ktorVersion")
+  implementation("io.ktor:ktor-server-resources:$ktorVersion")
+  implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
+  implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+  implementation("io.ktor:ktor-server-host-common:$ktorVersion")
+  implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+  implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
+  implementation("io.ktor:ktor-server-netty:$ktorVersion")
+  implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+  implementation("io.ktor:ktor-serialization:$ktorVersion")
+  implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 
-  implementation(Deps.Ktor.Client.core)
-  implementation(Deps.Ktor.Client.cio)
-  implementation(Deps.Ktor.Client.serialization)
-  implementation(Deps.Ktor.Client.auth)
+  implementation("io.ktor:ktor-client-core:$ktorVersion")
+  implementation("io.ktor:ktor-client-cio:$ktorVersion")
+  implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+  implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
-  implementation(Deps.Exposed.core)
-  implementation(Deps.Exposed.dao)
-  implementation(Deps.Exposed.javaTime)
-  implementation(Deps.Exposed.jdbc)
+  val exposedVersion = "0.45.0"
+  implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+  implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+  implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+  implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
-  implementation(Deps.jbcrypt)
-  implementation(Deps.hikaricp)
-  implementation(Deps.logback)
-  implementation(Deps.kotlinLogging)
-  implementation(Deps.mysqlConnector)
+  implementation("org.mindrot:jbcrypt:0.4")
+  implementation("com.zaxxer:HikariCP:5.1.0")
+  implementation("ch.qos.logback:logback-classic:1.4.14")
+  implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+  implementation("mysql:mysql-connector-java:8.0.28")
 
-  implementation(Deps.scientist)
+  implementation("com.github.spoptchev:scientist:1.0.2")
 
-  implementation("commons-validator:commons-validator:1.7")
-  implementation("com.auth0:java-jwt:3.18.2")
+  implementation("commons-validator:commons-validator:1.8.0")
+  //implementation("commons-collections:commons-collections:3.2.2")
+  implementation("org.apache.commons:commons-collections4:4.4")
+  implementation("com.auth0:java-jwt:4.4.0")
 
-  testImplementation(Deps.Testing.serverTest)
-  testImplementation(Deps.Testing.coroutinesTest)
-  testImplementation(Deps.Testing.kotestJunit5)
-  testImplementation(Deps.Testing.kotestAssertionsCore)
-  testImplementation(Deps.Testing.kotestAssertionsJson)
-  testImplementation(Deps.Testing.kotestAssertionsKtor)
-  testImplementation(Deps.Testing.kotestAssertionsArrow)
-  testImplementation(Deps.Testing.h2)
+  testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutinesVersion")
+  val kotestVersion = "5.8.0"
+  testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+  testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
+  testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
+  testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.4.0")
+  testImplementation("com.h2database:h2:2.2.220")
 }
 
 spotless {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 interface CommentsDao {
   suspend fun get(commentId: CommentId, userId: UserId): Option<Comment>
@@ -65,7 +66,7 @@ class DefaultCommentsDao(
   }
 
   override suspend fun delete(slug: Slug, commentId: CommentId): Int = transactionRunner {
-    CommentTable.deleteWhere { CommentTable.id eq commentId.value }
+    CommentTable.deleteWhere { CommentTable.id.eq(commentId.value) }
   }
 
   private suspend fun mapper(rr: ResultRow, userId: UserId?): Comment {

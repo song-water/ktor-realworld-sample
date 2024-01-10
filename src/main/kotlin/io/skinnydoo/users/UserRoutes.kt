@@ -1,30 +1,28 @@
-@file:OptIn(KtorExperimentalLocationsAPI::class)
-
 package io.skinnydoo.users
 
-import io.ktor.application.*
-import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.Route
-import io.ktor.routing.application
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.resources.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.skinnydoo.API_V1
 import io.skinnydoo.common.*
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
-@Location("/users/login")
+@Resource("/users/login")
 class UserLoginRoute
 
-@Location("/users")
+@Resource("/users")
 class UserCreateRoute
 
-@Location("/user")
+@Resource("/user")
 class UserRoute
 
 /**
@@ -69,10 +67,12 @@ fun Route.loginUser() {
  * GET /v1/user
  */
 fun Route.getCurrentUser() {
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     get<UserRoute> {
-      val loggedInUser = call.principal<User>() ?: return@get call.respond(HttpStatusCode.Unauthorized,
-        ErrorEnvelope(mapOf("body" to listOf("Unknown user"))))
+      val loggedInUser = call.principal<User>() ?: return@get call.respond(
+        HttpStatusCode.Unauthorized,
+        ErrorEnvelope(mapOf("body" to listOf("Unknown user")))
+      )
       call.respond(UserResponse(LoggedInUser.fromUser(loggedInUser, token = "")))
     }
   }
@@ -85,12 +85,14 @@ fun Route.getCurrentUser() {
 fun Route.updateUser() {
   val updateUser by inject<UpdateUser>(named("updateUser"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     put<UserRoute> {
       val body = call.receive<UserUpdateRequest>().user
 
-      val loggedInUser = call.principal<User>() ?: return@put call.respond(HttpStatusCode.Unauthorized,
-        ErrorEnvelope(mapOf("body" to listOf("Unknown user"))))
+      val loggedInUser = call.principal<User>() ?: return@put call.respond(
+        HttpStatusCode.Unauthorized,
+        ErrorEnvelope(mapOf("body" to listOf("Unknown user")))
+      )
 
       updateUser(loggedInUser.id, body).map { UserResponse(LoggedInUser.fromUser(it, token = "")) }
         .fold({ handleErrors(it) }, { call.respond(it) })

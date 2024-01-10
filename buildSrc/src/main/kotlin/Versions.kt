@@ -1,6 +1,6 @@
 object Versions {
   const val ktor = "1.6.5"
-  const val kotlin = "1.6.0"
+  const val kotlin = "1.9.21"
   const val logback = "1.2.3"
   const val exposed = "0.37.3"
   const val mysqlConnector = "8.0.26"

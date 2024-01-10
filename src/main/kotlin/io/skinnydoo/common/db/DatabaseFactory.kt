@@ -2,7 +2,7 @@ package io.skinnydoo.common.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.skinnydoo.common.logging.KotlinLoggingSqlLogger
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database

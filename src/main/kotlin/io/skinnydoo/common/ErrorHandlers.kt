@@ -1,15 +1,17 @@
 package io.skinnydoo.common
 
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.features.StatusPages
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.util.pipeline.PipelineContext
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.util.pipeline.*
 
-fun StatusPages.Configuration.configure() {
-  exception<Throwable> { e ->
-    call.respond(HttpStatusCode.InternalServerError, ErrorEnvelope(mapOf("body" to listOf(e.localizedMessage))))
+fun StatusPagesConfig.configure() {
+  exception<Throwable> { call, cause ->
+    call.respond(
+      HttpStatusCode.InternalServerError,
+      ErrorEnvelope(mapOf("body" to listOf(cause.localizedMessage)))
+    )
   }
 }
 
@@ -18,6 +20,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleErrors(error: LoginErro
     val errorBody = ErrorEnvelope(mapOf("body" to listOf("Unknown email")))
     call.respond(status = HttpStatusCode.Unauthorized, message = errorBody)
   }
+
   LoginErrors.PasswordInvalid -> {
     val errorBody = ErrorEnvelope(mapOf("body" to listOf("Invalid password")))
     call.respond(status = HttpStatusCode.Unauthorized, message = errorBody)
@@ -29,6 +32,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleErrors(error: UserError
     val errorBody = ErrorEnvelope(mapOf("body" to listOf(error.message)))
     call.respond(HttpStatusCode.UnprocessableEntity, errorBody)
   }
+
   is UserErrors.UserNotFound -> {
     val errorBody = ErrorEnvelope(mapOf("body" to listOf(error.message)))
     call.respond(HttpStatusCode.NotFound, errorBody)
@@ -40,12 +44,14 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleErrors(error: ArticleEr
     val errorBody = ErrorEnvelope(mapOf("body" to listOf("Article with slug ${error.slug} does not exist")))
     call.respond(HttpStatusCode.NotFound, errorBody)
   }
+
   ArticleErrors.AuthorNotFound -> call.respond(HttpStatusCode.InternalServerError)
   Forbidden -> call.respond(HttpStatusCode.Unauthorized)
   is ServerError -> {
     val errorBody = ErrorEnvelope(mapOf("body" to listOf(error.message)))
     call.respond(HttpStatusCode.InternalServerError, errorBody)
   }
+
   is ArticleErrors.CommentNotFound -> {
     val errorBody = ErrorEnvelope(mapOf("body" to listOf("Comment with id ${error.commentId} does not exist")))
     call.respond(HttpStatusCode.NotFound, errorBody)
@@ -64,5 +70,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleErrors(error: CommonErr
     val errorBody = ErrorEnvelope(mapOf("body" to listOf(error.message)))
     call.respond(HttpStatusCode.InternalServerError, errorBody)
   }
+
   Forbidden -> call.respond(HttpStatusCode.Unauthorized)
 }

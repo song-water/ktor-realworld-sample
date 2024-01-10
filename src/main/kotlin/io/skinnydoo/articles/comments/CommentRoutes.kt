@@ -1,19 +1,16 @@
 package io.skinnydoo.articles.comments
 
 import arrow.core.Either
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.auth.authenticate
-import io.ktor.auth.principal
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.delete
-import io.ktor.locations.get
-import io.ktor.locations.post
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.skinnydoo.API_V1
 import io.skinnydoo.articles.ArticleRoute
 import io.skinnydoo.common.*
@@ -21,11 +18,12 @@ import io.skinnydoo.users.User
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 import java.util.*
+import kotlin.text.get
 
 fun Route.getCommentsForArticle() {
   val commentsForArticle by inject<GetCommentsForArticleUseCase>(named("commentsForArticle"))
 
-  authenticate("auth-jwt", optional = true) {
+  defaultAuthenticate(optional = true) {
     get<ArticleRoute.Comments> { params ->
       val userId = call.principal<User>()?.id
 
@@ -41,7 +39,7 @@ fun Route.getCommentsForArticle() {
 fun Route.addCommentForArticle() {
   val addComments by inject<AddCommentForArticleUseCase>(named("addComments"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     post<ArticleRoute.Comments> { params ->
       val userId = call.principal<User>()?.id ?: return@post call.respond(HttpStatusCode.Unauthorized,
         ErrorEnvelope(mapOf("body" to listOf("Unauthorized"))))
@@ -61,7 +59,7 @@ fun Route.addCommentForArticle() {
 fun Route.removeCommentForArticle() {
   val removeComments by inject<RemoveCommentFromArticleUseCase>(named("removeComments"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     delete<ArticleRoute.Comments.Comment> { params ->
       val userId = call.principal<User>()?.id ?: return@delete call.respond(HttpStatusCode.Unauthorized,
         ErrorEnvelope(mapOf("body" to listOf("Unauthorized"))))

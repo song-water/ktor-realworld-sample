@@ -23,6 +23,6 @@ object CommentTable : IntIdTable(name = "comments") {
     onDelete = CASCADE,
     fkName = "fk_comments_article_slug"
   )
-  val createAt: Column<LocalDateTime> = datetime("created_at").defaultExpression(CurrentDateTime())
-  val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime())
+  val createAt: Column<LocalDateTime> = datetime("created_at").defaultExpression(CurrentDateTime)
+  val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime)
 }

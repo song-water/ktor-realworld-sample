@@ -3,6 +3,7 @@ package io.skinnydoo.users
 import io.skinnydoo.common.UserId
 import io.skinnydoo.common.db.DatabaseTransactionRunner
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 interface UserFollowerDao {
   suspend fun insert(userId: UserId, otherId: UserId)
@@ -24,7 +25,7 @@ class DefaultUserFollowerDao(private val transactionRunner: DatabaseTransactionR
   override suspend fun remove(userId: UserId, otherId: UserId) {
     transactionRunner {
       FollowerTable.deleteWhere {
-        FollowerTable.userId eq userId.value and (FollowerTable.followeeId eq otherId.value)
+        FollowerTable.userId.eq(userId.value) and (FollowerTable.followeeId.eq(otherId.value))
       }
     }
   }

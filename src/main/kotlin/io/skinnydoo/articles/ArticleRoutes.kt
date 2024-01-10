@@ -1,20 +1,19 @@
-@file:OptIn(KtorExperimentalLocationsAPI::class)
-
 package io.skinnydoo.articles
 
 import arrow.core.Either
 import arrow.core.getOrElse
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.auth.authenticate
-import io.ktor.auth.principal
-import io.ktor.http.HttpStatusCode
-import io.ktor.locations.*
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.http.*
+import io.ktor.resources.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.skinnydoo.API_V1
 import io.skinnydoo.articles.tags.Tag
 import io.skinnydoo.common.*
@@ -25,7 +24,7 @@ import java.util.*
 
 const val ARTICLES = "/articles"
 
-@Location(ARTICLES)
+@Resource(ARTICLES)
 data class ArticlesRoute(
   val tag: String = "",
   val author: String = "",
@@ -34,20 +33,20 @@ data class ArticlesRoute(
   val offset: Int = 0,
 )
 
-@Location("$ARTICLES/feed")
+@Resource("$ARTICLES/feed")
 data class ArticleFeedRoute(val limit: Int = 20, val offset: Int = 0)
 
-@Location("$ARTICLES/{slug}")
+@Resource("$ARTICLES/{slug}")
 data class ArticleRoute(val slug: String) {
 
-  @Location("/comments")
+  @Resource("/comments")
   data class Comments(val parent: ArticleRoute) {
 
-    @Location("/{id}")
+    @Resource("/{id}")
     data class Comment(val parent: Comments, val id: Int)
   }
 
-  @Location("/favorite")
+  @Resource("/favorite")
   data class Favorite(val parent: ArticleRoute)
 }
 
@@ -57,7 +56,7 @@ data class ArticleRoute(val slug: String) {
 fun Route.allArticles() {
   val getAllArticles by inject<GetAllArticlesUseCase>(named("allArticles"))
 
-  authenticate("auth-jwt", optional = true) {
+  defaultAuthenticate(optional = true) {
     get<ArticlesRoute> { params ->
       val selfId = call.principal<User>()?.id
 
@@ -80,7 +79,7 @@ fun Route.allArticles() {
 fun Route.articleFeed() {
   val feedArticles by inject<GetFeedArticlesUseCase>(named("feed"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     get<ArticleFeedRoute> { params ->
       val self = call.principal<User>()
         ?: return@get call.respond(HttpStatusCode.Unauthorized, ErrorEnvelope(mapOf("body" to listOf("Unauthorized"))))
@@ -100,7 +99,7 @@ fun Route.articleFeed() {
 fun Route.createArticle() {
   val addArticle by inject<AddArticleUseCase>(named("addArticle"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     post<ArticlesRoute> {
       val body = call.receive<CreateArticleRequest>().article
 
@@ -123,7 +122,7 @@ fun Route.createArticle() {
 fun Route.getArticleWithSlug() {
   val getArticleWithSlug by inject<GetArticleWithSlugUseCase>(named("getArticle"))
 
-  authenticate("auth-jwt", optional = true) {
+  defaultAuthenticate(optional = true) {
     get<ArticleRoute> { params ->
       val userId = call.principal<User>()?.id
 
@@ -145,7 +144,7 @@ fun Route.getArticleWithSlug() {
 fun Route.updateArticle() {
   val updateArticle by inject<UpdateArticleUseCase>(named("updateArticle"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     put<ArticleRoute> { params ->
       val self = call.principal<User>()
         ?: return@put call.respond(HttpStatusCode.Unauthorized, ErrorEnvelope(mapOf("body" to listOf("Unauthorized"))))
@@ -168,7 +167,7 @@ fun Route.updateArticle() {
 fun Route.deleteArticle() {
   val deleteArticleWithSlug by inject<DeleteArticleUseCase>(named("deleteArticle"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     delete<ArticleRoute> { params ->
       val user = call.principal<User>()
         ?: return@delete call.respond(
@@ -189,7 +188,7 @@ fun Route.deleteArticle() {
 fun Route.favoriteArticle() {
   val favorArticle by inject<FavorArticleUseCase>(named("favorArticle"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     post<ArticleRoute.Favorite> { params ->
       val user = call.principal<User>()
         ?: return@post call.respond(
@@ -210,7 +209,7 @@ fun Route.favoriteArticle() {
 fun Route.unFavoriteArticle() {
   val unFavorArticle by inject<UnFavorArticleUseCase>(named("unFavorArticle"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     delete<ArticleRoute.Favorite> { params ->
       val user = call.principal<User>()
         ?: return@delete call.respond(

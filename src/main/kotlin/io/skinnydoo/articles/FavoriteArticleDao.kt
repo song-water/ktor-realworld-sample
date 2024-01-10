@@ -3,6 +3,7 @@ package io.skinnydoo.articles
 import io.skinnydoo.common.Slug
 import io.skinnydoo.common.UserId
 import io.skinnydoo.common.db.DatabaseTransactionRunner
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 
@@ -21,6 +22,6 @@ class DefaultFavoriteArticleDao(private val transactionRunner: DatabaseTransacti
   }
 
   override suspend fun delete(slug: Slug): Unit = transactionRunner {
-    FavoriteArticleTable.deleteWhere { FavoriteArticleTable.articleSlug eq slug.value }
+    FavoriteArticleTable.deleteWhere { FavoriteArticleTable.articleSlug.eq(slug.value) }
   }
 }

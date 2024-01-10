@@ -9,10 +9,6 @@ import org.koin.core.logger.MESSAGE
 private val logger = KotlinLogging.logger(KOIN_TAG)
 
 class KotlinLoggingKoinLogger(level: Level = Level.INFO) : Logger(level) {
-  override fun log(level: Level, msg: MESSAGE) {
-    if (this.level <= level) logOnLevel(msg)
-  }
-
   private fun logOnLevel(msg: MESSAGE) {
     when (this.level) {
       Level.DEBUG -> logger.debug { msg }
@@ -20,5 +16,9 @@ class KotlinLoggingKoinLogger(level: Level = Level.INFO) : Logger(level) {
       Level.ERROR -> logger.error { msg }
       else -> logger.error { msg }
     }
+  }
+
+  override fun display(level: Level, msg: MESSAGE) {
+    if (this.level <= level) logOnLevel(msg)
   }
 }

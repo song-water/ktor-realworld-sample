@@ -1,6 +1,6 @@
 package io.skinnydoo.users
 
-import io.ktor.auth.*
+import io.ktor.server.auth.*
 import io.skinnydoo.common.Email
 import io.skinnydoo.common.Password
 import io.skinnydoo.common.UserId

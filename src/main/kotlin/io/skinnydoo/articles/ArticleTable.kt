@@ -16,8 +16,8 @@ object ArticleTable : Table(name = "articles") {
   val description = varchar("description", 140).default("")
   val body = text("body")
   val authorId = reference("author_id", UserTable)
-  val createAt: Column<LocalDateTime> = datetime("created_at").defaultExpression(CurrentDateTime())
-  val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime())
+  val createAt: Column<LocalDateTime> = datetime("created_at").defaultExpression(CurrentDateTime)
+  val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime)
 
   override val primaryKey by lazy { PrimaryKey(slug) }
 }

@@ -1,39 +1,35 @@
-@file:OptIn(KtorExperimentalLocationsAPI::class)
 
 package io.skinnydoo.profiles
 
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.auth.authenticate
-import io.ktor.auth.principal
-import io.ktor.http.HttpStatusCode
-import io.ktor.locations.KtorExperimentalLocationsAPI
-import io.ktor.locations.Location
-import io.ktor.locations.delete
-import io.ktor.locations.get
-import io.ktor.locations.post
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.http.*
+import io.ktor.resources.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.skinnydoo.API_V1
 import io.skinnydoo.common.ErrorEnvelope
 import io.skinnydoo.common.Username
+import io.skinnydoo.common.defaultAuthenticate
 import io.skinnydoo.common.handleErrors
 import io.skinnydoo.users.User
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
-@Location("/profiles/{username}")
+@Resource("/profiles/{username}")
 data class UserProfileRoute(val username: String)
 
-@Location("/profiles/{username}/follow")
+@Resource("/profiles/{username}/follow")
 data class FollowUserRoute(val username: String)
 
 fun Route.getUserProfile() {
   val getProfileForUser by inject<GetUserProfileUseCase>(named("getUserProfile"))
 
-  authenticate("auth-jwt", optional = true) {
+  defaultAuthenticate(optional = true) {
     get<UserProfileRoute> { params ->
       val self = call.principal<User>()
       getProfileForUser(self?.id, Username(params.username))
@@ -46,7 +42,7 @@ fun Route.getUserProfile() {
 fun Route.followUser() {
   val followUser by inject<FollowUserUseCase>(named("followUser"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     post<FollowUserRoute> { params ->
       val self = call.principal<User>()
         ?: return@post call.respond(
@@ -64,7 +60,7 @@ fun Route.followUser() {
 fun Route.unfollowUser() {
   val unfollowUser by inject<UnfollowUserUseCase>(named("unfollowUser"))
 
-  authenticate("auth-jwt") {
+  defaultAuthenticate() {
     delete<FollowUserRoute> { params ->
       val self = call.principal<User>()
         ?: return@delete call.respond(
